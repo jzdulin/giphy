@@ -7,19 +7,78 @@
     <title>Document</title>
 </head>
 <body>
-    <!-- Rendered Buttons will get Dumped Here  -->
-    <div id="buttons-view"></div>
+    <!-- contains EVERYTHING -->
+    <div class="container">
+        <h1>Animal Gif Search</h1>
+            
+        <button data-animal="dog">
+            Dog
+        </button>
+        <button data-animal="cat">
+            Cat
+        </button>
+        <!-- Rendered Buttons will get Dumped Here  -->
+        <div id="buttons-view"></div>
 
-    <form id="animal-form">
-      <label for="animal-input">Add an animal!</label>
-      <input type="text" id="animal-input">
-      <br>
+        <form id="animal-form">
+            <label for="animal-input">Add an animal!</label>
+            <input type="text" id="animal-input">
+            <br>
 
-    <!-- Animal Gifs will Get Dumped Dere -->
-    <div id="animal-view"></div>
+        <!-- Animal Gifs will Get Dumped Dere -->
+            <div id="gifs-appear-here"></div>
 
-      <!-- Button triggers new animal button to be added -->
-      <input id="add-animal" type="submit" value="Add an animal!">
-    </form>
+        <!-- Button triggers new animal button to be added -->
+            <input id="add-animal" type="submit" value="Add an animal!">
+        </form>
+        
+        <!-- Javascript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script type="text/javascript">
+
+            $("button").on("click", function() {
+
+                var animal = $(this).attr("data-animal");
+                var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + animal + "&api_key=Cvp6POiQpZQ5nSataKwr6wVDWh293h4i&limit=10";
+
+                $.ajax({
+                    url: queryURL,
+                    method: "GET"
+                }).then(function(response) {
+
+                    var results = response.data;
+
+                    for (var i = 0; i < results.length; i++) {
+
+                        // Only taking action if the photo has an appropriate rating
+                        if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
+                            // Creating a div with the class "item"
+                            var gifDiv = $("<div class='item'>");
+
+                            // Storing the result item's rating
+                            var rating = results[i].rating;
+
+                            // Creating a paragraph tag with the result item's rating
+                            var p = $("<p>").text("Rating: " + rating);
+
+                            // Creating an image tag
+                            var animalImage = $("<img>");
+
+                            // Giving the image tag an src attribute of a proprty pulled off the
+                            // result item
+                            animalImage.attr("src", results[i].images.fixed_height_still.url);
+
+                            // Appending the paragraph and animalImage we created to the "gifDiv" div we created
+                            gifDiv.append(p);
+                            gifDiv.append(animalImage);
+
+                            // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+                            $("#gifs-appear-here").prepend(gifDiv);
+                        }
+                    }
+                });
+            });
+        </script>
+    </div>
 </body>
 </html>
